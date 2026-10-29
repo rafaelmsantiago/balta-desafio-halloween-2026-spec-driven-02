@@ -14,6 +14,8 @@
 - Toda regra de negócio precisa ter teste unitário
 - Todo endpoint precisa ter ao menos um teste de integração de caminho feliz
 - Erro de validação sempre retorna 400 com ProblemDetails
+- Conflito com estado existente, como recurso duplicado, retorna 409 com
+  ProblemDetails
 
 ## Convenções
 - Nomes de classe e arquivo em inglês, mensagens de erro em português
