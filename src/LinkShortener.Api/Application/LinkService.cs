@@ -70,6 +70,9 @@ public sealed class LinkService(
         if (link is null)
             return ResolveLinkResult.NotFound();
 
+        // RF-05: toda requisição a link válido conta, sem filtro de robôs nem de repetições.
+        await links.IncrementAccessCountAsync(link.Id, cancellationToken);
+
         return ResolveLinkResult.Redirect(link.TargetUrl);
     }
 }

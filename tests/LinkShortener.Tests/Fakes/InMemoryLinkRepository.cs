@@ -22,4 +22,10 @@ public sealed class InMemoryLinkRepository : ILinkRepository
 
     public Task<Link?> FindByCodeAsync(string code, CancellationToken cancellationToken) =>
         Task.FromResult(Links.SingleOrDefault(l => l.Code == code));
+
+    public Task IncrementAccessCountAsync(int linkId, CancellationToken cancellationToken)
+    {
+        Links.Single(l => l.Id == linkId).AccessCount++;
+        return Task.CompletedTask;
+    }
 }

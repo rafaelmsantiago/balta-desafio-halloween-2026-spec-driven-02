@@ -30,4 +30,9 @@ public sealed class LinkRepository(LinksDbContext context) : ILinkRepository
 
     public Task<Link?> FindByCodeAsync(string code, CancellationToken cancellationToken) =>
         context.Links.AsNoTracking().SingleOrDefaultAsync(l => l.Code == code, cancellationToken);
+
+    public Task IncrementAccessCountAsync(int linkId, CancellationToken cancellationToken) =>
+        context.Links
+            .Where(l => l.Id == linkId)
+            .ExecuteUpdateAsync(set => set.SetProperty(l => l.AccessCount, l => l.AccessCount + 1), cancellationToken);
 }

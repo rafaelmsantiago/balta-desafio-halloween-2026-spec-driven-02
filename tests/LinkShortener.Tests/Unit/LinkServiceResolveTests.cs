@@ -30,6 +30,15 @@ public class LinkServiceResolveTests
     }
 
     [Fact]
+    public async Task Acessos_repetidos_incrementam_o_contador_a_cada_requisicao()
+    {
+        for (var i = 0; i < 3; i++)
+            await _service.ResolveAsync("PROMO26", CancellationToken.None);
+
+        Assert.Equal(3, _repository.Links.Single().AccessCount);
+    }
+
+    [Fact]
     public async Task Codigo_inexistente_nao_e_encontrado()
     {
         var result = await _service.ResolveAsync("NAOEXISTE", CancellationToken.None);

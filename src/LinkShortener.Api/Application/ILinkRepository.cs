@@ -8,4 +8,7 @@ public interface ILinkRepository
     Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken);
 
     Task<Link?> FindByCodeAsync(string code, CancellationToken cancellationToken);
+
+    // D-02: incremento atômico no banco, sem ler e reescrever o valor.
+    Task IncrementAccessCountAsync(int linkId, CancellationToken cancellationToken);
 }
