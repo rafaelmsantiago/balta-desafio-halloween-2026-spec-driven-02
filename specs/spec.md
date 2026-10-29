@@ -39,7 +39,7 @@ esse link e acompanhe quantos acessos ele recebeu.
   válido até 23:59:59 UTC da data informada; link sem data de expiração nunca
   expira
 - RF-07: o sistema devolve o total de acessos de um link a qualquer pessoa que
-  conheça seu código, inclusive depois que o link expirou
+  conheça seu código, inclusive depois que o link expira, inclusive depois que o link expirou
 - RF-08: os links e seus dados devem ser persistidos em banco de dados para que
   não se percam após reinício da aplicação
 
