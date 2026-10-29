@@ -1,5 +1,5 @@
-using System.Net;
 using LinkShortener.Api.Application;
+using LinkShortener.Tests.Fakes;
 
 namespace LinkShortener.Tests.Unit;
 
@@ -60,15 +60,4 @@ public class PublicHostCheckerTests
     private static Task<bool> IsAccessible(string url, params string[] addresses) =>
         new PublicHostChecker(new FakeHostResolver(addresses))
             .IsPubliclyAccessibleAsync(new Uri(url), CancellationToken.None);
-}
-
-public sealed class FakeHostResolver(params string[] addresses) : IHostResolver
-{
-    public string? LastHost { get; private set; }
-
-    public Task<IReadOnlyList<IPAddress>> ResolveAsync(string host, CancellationToken cancellationToken)
-    {
-        LastHost = host;
-        return Task.FromResult<IReadOnlyList<IPAddress>>(addresses.Select(IPAddress.Parse).ToArray());
-    }
 }
