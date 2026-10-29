@@ -24,9 +24,10 @@ Uma API de encurtador de links em **.NET 10 (Minimal API)**, com **SQLite via EF
 - **Persistência**: os links sobrevivem ao reinício da aplicação
 - **115 testes** unitários e de integração, cobrindo os critérios de aceite de cada tarefa
 
-Para rodar: `dotnet run --project src/LinkShortener.Api`. Para testar: `dotnet test`.
+Para rodar: `dotnet run --project src/LinkShortener.Api` (sobe em http://localhost:5069). Para testar: `dotnet test`.
 
 Neste processo eu aprendi:
+
 * ✅ Escrever a especificação antes do código: requisitos, regras de negócio, casos de borda e critérios de aceite numerados (RF, RN) viram a referência de toda a implementação
 * ✅ Separar o que é inegociável (constituição) das escolhas técnicas (plano) e das unidades de trabalho (tarefas), cada uma com seu papel
 * ✅ Usar a governança a meu favor: quando o plano não justificava as dependências que a constituição exige, quem mudou foi o plano (D-12), em commit separado
@@ -36,14 +37,41 @@ Neste processo eu aprendi:
 * ✅ Que detalhes pequenos da spec evitam bugs reais, como converter para maiúsculas sem depender da cultura do servidor (em turco, "i" vira "İ")
 * ✅ Revisar e reverter decisões na própria spec antes de virarem código, quando é mais barato mudar
 
-## Bagde
+#### Como o projeto foi conduzido
+Cada artefato em [specs/](specs/) alimenta o próximo:
+
+1. [spec.md](specs/spec.md): o problema, os requisitos (RF-01 a RF-08), as regras de negócio (RN-01 a RN-07), os casos de borda e os critérios de aceite
+2. [constitution.md](specs/constitution.md): as regras que valem para todo o projeto, como stack, arquitetura, qualidade e convenções
+3. [plan.md](specs/plan.md): as decisões técnicas (D-01 a D-12), cada uma ligada ao requisito que atende
+4. [tasks.md](specs/tasks.md): as tarefas (T-01 a T-18), com dependências e o critério de "concluída quando"
+
+A implementação seguiu uma tarefa por vez, na ordem das dependências, com um commit por tarefa citando os IDs atendidos.
+
+#### Exemplo de uso
+
+```bash
+# Criar um link com código próprio e data de expiração
+curl -X POST http://localhost:5069/api/links \
+  -H "Content-Type: application/json" \
+  -d '{"targetUrl":"https://balta.io","code":"balta26","expiresOn":"2026-12-31"}'
+# {"shortUrl":"http://localhost:5069/BALTA26","code":"BALTA26","expiresOn":"2026-12-31"}
+
+# Acessar o link curto (302 para o destino)
+curl -i http://localhost:5069/balta26
+
+# Consultar o total de acessos
+curl http://localhost:5069/api/links/BALTA26/stats
+# {"code":"BALTA26","accessCount":1}
+```
+
+## Badge
 <img src="https://baltaio.blob.core.windows.net/static/images/v4/challenges/halloween-2026/02.png" width="200" />
 
 ## Problema
---
+Links longos quebram em mensagens, e-mails e materiais impressos, e não dá para medir quantos acessos eles receberam. O encurtador transforma uma URL longa em um link curto, que pode ser compartilhado e acompanhado pelo total de acessos.
 
 ## Sobre o Halloween 2026
-O desafio **Halloween 2026** consiste em implementar implementar o modelo Spec Driven Development de ponta a ponta, criando apps completas com IA.
+O desafio **Halloween 2026** consiste em implementar o modelo Spec Driven Development de ponta a ponta, criando apps completas com IA.
 
 ### Veja meu progresso no desafio
 https://github.com/balta-io/balta-desafio-halloween-2026-spec-driven-02
