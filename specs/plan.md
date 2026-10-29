@@ -51,8 +51,8 @@ do projeto.
 - D-09: contrato de erro, conforme a constituição: toda falha de validação
   (RN-02, RN-05, tamanho do RF-03, limite de 2048 caracteres, data no passado,
   payload malformado) retorna 400 com ProblemDetails e mensagem em português.
-  Código próprio já em uso (RN-01, CB-01) retorna 409 com ProblemDetails,
-  conforme a regra de conflito da constituição.
+  Código próprio já em uso (RN-01) retorna 409 com ProblemDetails, por ser
+  conflito com um estado existente e não erro de validação da entrada.
   Respostas 404, 410 e 503 também usam ProblemDetails; a mensagem do 404 diz
   que o link não existe e a do 410 diz que o link expirou
 - D-10: código normalizado para maiúsculas no serviço antes de qualquer
