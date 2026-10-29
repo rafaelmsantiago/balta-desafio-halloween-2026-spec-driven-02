@@ -56,7 +56,9 @@ do projeto.
   Respostas 404, 410 e 503 também usam ProblemDetails; a mensagem do 404 diz
   que o link não existe e a do 410 diz que o link expirou
 - D-10: código normalizado para maiúsculas no serviço antes de qualquer
-  validação, gravação ou busca (RF-03, RF-04, RN-05). Na criação, o código
+  validação, gravação ou busca (RF-03, RF-04, RN-05), com conversão invariante
+  (ToUpperInvariant), para que o resultado não dependa da cultura do servidor
+  (em cultura turca, "i" viraria "İ" e seria recusado). Na criação, o código
   próprio é convertido e só depois validado contra o alfabeto; no
   redirecionamento e nas estatísticas, o código da URL é convertido antes da
   busca. Code fica sempre em maiúsculas no banco, então a comparação continua

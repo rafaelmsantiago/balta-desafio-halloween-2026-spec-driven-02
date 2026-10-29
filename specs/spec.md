@@ -47,9 +47,9 @@ esse link e acompanhe quantos acessos ele recebeu.
 - RN-01: o código do link é único em todo o sistema e nunca é reutilizado,
   mesmo depois que o link expira
 - RN-02: a URL de destino precisa usar http ou https e ser publicamente
-  acessível, ou seja, não pode apontar para a rede interna, para a própria
-  máquina nem para endereços reservados; a verificação acontece somente na
-  criação do link
+  acessível, ou seja, seu host precisa existir na internet e não pode apontar
+  para a rede interna, para a própria máquina nem para endereços reservados; a
+  verificação acontece somente na criação do link
 - RN-03: link expirado não redireciona e não conta acesso
 - RN-04: o contador de acessos nunca diminui
 - RN-05: códigos automáticos e personalizados são armazenados somente com A-Z
@@ -100,8 +100,8 @@ esse link e acompanhe quantos acessos ele recebeu.
 - Link criado sem data de expiração continua funcionando indefinidamente
 - Data de expiração anterior à data de hoje em UTC é recusada; a data de hoje é
   aceita
-- URL apontando para a rede interna, para a própria máquina ou para endereço
-  reservado é recusada na criação
+- URL com host inexistente, ou apontando para a rede interna, para a própria
+  máquina ou para endereço reservado, é recusada na criação
 - Qualquer pessoa que conheça o código pode consultar o total de acessos,
   inclusive de links expirados
 - Após reiniciar a aplicação, os links persistidos no banco continuam funcionando
