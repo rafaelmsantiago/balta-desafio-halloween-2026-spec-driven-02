@@ -47,6 +47,24 @@ public class CreateLinkTests : IDisposable
         Assert.All(links, l => Assert.Equal(0, l.AccessCount));
     }
 
+    [Fact]
+    public async Task Cria_link_com_data_de_expiracao()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(
+            "/api/links", new { targetUrl = "https://exemplo.com/", expiresOn = "2026-12-31" });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<CreatedLink>();
+        Assert.Equal("2026-12-31", body!.ExpiresOn);
+
+        using var scope = _factory.Services.CreateScope();
+        var link = scope.ServiceProvider.GetRequiredService<LinksDbContext>().Links.Single(l => l.Code == body.Code);
+        Assert.Equal(new DateTime(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc), link.ExpiresAtUtc);
+        Assert.Equal(DateTimeKind.Utc, link.ExpiresAtUtc!.Value.Kind);
+    }
+
     private static async Task<CreatedLink> CreateAsync(HttpClient client, string targetUrl)
     {
         var response = await client.PostAsJsonAsync("/api/links", new { targetUrl });

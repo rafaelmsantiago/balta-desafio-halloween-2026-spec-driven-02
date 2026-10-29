@@ -1,10 +1,13 @@
+using System.Globalization;
 using LinkShortener.Api.Application;
 
 namespace LinkShortener.Api.Endpoints;
 
 public static class LinkEndpoints
 {
-    public sealed record CreateLinkRequest(string? TargetUrl);
+    private const string DateFormat = "yyyy-MM-dd";
+
+    public sealed record CreateLinkRequest(string? TargetUrl, string? ExpiresOn);
 
     public sealed record CreateLinkResponse(string ShortUrl, string Code, string? ExpiresOn);
 
@@ -22,7 +25,16 @@ public static class LinkEndpoints
         if (string.IsNullOrWhiteSpace(request.TargetUrl))
             return BadRequest("O campo targetUrl é obrigatório.");
 
-        var result = await service.CreateAsync(new CreateLinkCommand(request.TargetUrl), cancellationToken);
+        DateOnly? expiresOn = null;
+        if (request.ExpiresOn is not null)
+        {
+            if (!DateOnly.TryParseExact(request.ExpiresOn, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                return BadRequest($"O campo expiresOn precisa ser uma data no formato {DateFormat}.");
+
+            expiresOn = date;
+        }
+
+        var result = await service.CreateAsync(new CreateLinkCommand(request.TargetUrl, expiresOn), cancellationToken);
 
         return result.Status switch
         {
@@ -38,8 +50,9 @@ public static class LinkEndpoints
     private static IResult Created(HttpRequest httpRequest, Link link)
     {
         var shortUrl = $"{httpRequest.Scheme}://{httpRequest.Host}{httpRequest.PathBase}/{link.Code}";
+        var expiresOn = LinkExpiration.ToExpiresOn(link.ExpiresAtUtc)?.ToString(DateFormat, CultureInfo.InvariantCulture);
 
-        return Results.Created(shortUrl, new CreateLinkResponse(shortUrl, link.Code, null));
+        return Results.Created(shortUrl, new CreateLinkResponse(shortUrl, link.Code, expiresOn));
     }
 
     private static IResult BadRequest(string detail) =>

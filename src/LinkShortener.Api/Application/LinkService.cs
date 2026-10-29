@@ -13,6 +13,10 @@ public sealed class LinkService(
         if (!TargetUrlRules.TryValidate(command.TargetUrl, out var targetUri, out var urlError))
             return CreateLinkResult.Invalid(urlError);
 
+        var utcNow = timeProvider.GetUtcNow();
+        if (!LinkExpiration.TryGetExpiresAtUtc(command.ExpiresOn, utcNow, out var expiresAtUtc, out var expirationError))
+            return CreateLinkResult.Invalid(expirationError);
+
         if (!await hostChecker.IsPubliclyAccessibleAsync(targetUri, cancellationToken))
             return CreateLinkResult.Invalid(
                 "A URL de destino precisa ser publicamente acessível: o host deve existir e não pode apontar para a rede interna, para a própria máquina nem para endereços reservados.");
@@ -25,7 +29,8 @@ public sealed class LinkService(
             {
                 Code = codeGenerator.Generate(),
                 TargetUrl = command.TargetUrl,
-                CreatedAtUtc = timeProvider.GetUtcNow().UtcDateTime,
+                CreatedAtUtc = utcNow.UtcDateTime,
+                ExpiresAtUtc = expiresAtUtc,
             };
 
             if (await links.TryAddAsync(link, cancellationToken))
