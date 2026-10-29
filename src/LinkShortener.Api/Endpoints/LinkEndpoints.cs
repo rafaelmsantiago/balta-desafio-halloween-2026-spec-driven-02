@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json;
 using LinkShortener.Api.Application;
 
 namespace LinkShortener.Api.Endpoints;
@@ -41,11 +42,16 @@ public static class LinkEndpoints
     }
 
     private static async Task<IResult> CreateAsync(
-        CreateLinkRequest request,
         HttpRequest httpRequest,
         LinkService service,
         CancellationToken cancellationToken)
     {
+        // O corpo é lido aqui, e não pelo binding automático, para que payload
+        // malformado também responda 400 com mensagem em português (D-09).
+        var request = await ReadRequestAsync(httpRequest, cancellationToken);
+        if (request is null)
+            return BadRequest("O corpo da requisição precisa ser um JSON válido com targetUrl, code e expiresOn como texto.");
+
         if (string.IsNullOrWhiteSpace(request.TargetUrl))
             return BadRequest("O campo targetUrl é obrigatório.");
 
@@ -74,6 +80,21 @@ public static class LinkEndpoints
                 title: "Serviço indisponível",
                 detail: result.Error),
         };
+    }
+
+    private static async Task<CreateLinkRequest?> ReadRequestAsync(HttpRequest httpRequest, CancellationToken cancellationToken)
+    {
+        if (!httpRequest.HasJsonContentType())
+            return null;
+
+        try
+        {
+            return await httpRequest.ReadFromJsonAsync<CreateLinkRequest>(cancellationToken);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     private static IResult Created(HttpRequest httpRequest, Link link)
