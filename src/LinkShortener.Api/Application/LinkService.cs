@@ -79,4 +79,12 @@ public sealed class LinkService(
 
         return ResolveLinkResult.Redirect(link.TargetUrl);
     }
+
+    // RF-07: público e disponível inclusive para link expirado. Nulo quando o código não existe.
+    public async Task<LinkStats?> GetStatsAsync(string code, CancellationToken cancellationToken)
+    {
+        var link = await links.FindByCodeAsync(LinkCode.Normalize(code), cancellationToken);
+
+        return link is null ? null : new LinkStats(link.Code, link.AccessCount);
+    }
 }

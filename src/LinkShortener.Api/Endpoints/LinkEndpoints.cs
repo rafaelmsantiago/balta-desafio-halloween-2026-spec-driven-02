@@ -14,7 +14,15 @@ public static class LinkEndpoints
     public static void MapLinkEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/links", CreateAsync);
+        app.MapGet("/api/links/{code}/stats", GetStatsAsync);
         app.MapGet("/{code}", RedirectAsync);
+    }
+
+    private static async Task<IResult> GetStatsAsync(string code, LinkService service, CancellationToken cancellationToken)
+    {
+        var stats = await service.GetStatsAsync(code, cancellationToken);
+
+        return stats is null ? NotFound() : Results.Ok(stats);
     }
 
     private static async Task<IResult> RedirectAsync(string code, LinkService service, CancellationToken cancellationToken)
