@@ -4,6 +4,7 @@ public enum ResolveLinkStatus
 {
     Redirect,
     NotFound,
+    Expired,
 }
 
 public sealed record ResolveLinkResult(ResolveLinkStatus Status, string? TargetUrl = null)
@@ -11,4 +12,6 @@ public sealed record ResolveLinkResult(ResolveLinkStatus Status, string? TargetU
     public static ResolveLinkResult Redirect(string targetUrl) => new(ResolveLinkStatus.Redirect, targetUrl);
 
     public static ResolveLinkResult NotFound() => new(ResolveLinkStatus.NotFound);
+
+    public static ResolveLinkResult Expired() => new(ResolveLinkStatus.Expired);
 }

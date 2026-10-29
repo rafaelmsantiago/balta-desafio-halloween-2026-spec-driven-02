@@ -24,6 +24,10 @@ public static class LinkEndpoints
         return result.Status switch
         {
             ResolveLinkStatus.Redirect => Results.Redirect(result.TargetUrl!),
+            ResolveLinkStatus.Expired => Results.Problem(
+                statusCode: StatusCodes.Status410Gone,
+                title: "Link expirado",
+                detail: "O link informado expirou."),
             _ => NotFound(),
         };
     }

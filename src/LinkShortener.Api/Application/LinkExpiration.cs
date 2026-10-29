@@ -29,6 +29,10 @@ public static class LinkExpiration
         return true;
     }
 
+    // RN-03 e D-06: válido enquanto o instante atual for menor que o limite; sem limite, nunca expira.
+    public static bool IsExpired(DateTime? expiresAtUtc, DateTimeOffset utcNow) =>
+        expiresAtUtc is { } limit && utcNow.UtcDateTime >= limit;
+
     // Data informada na criação, recuperada a partir do limite exclusivo.
     public static DateOnly? ToExpiresOn(DateTime? expiresAtUtc) =>
         expiresAtUtc is { } value ? DateOnly.FromDateTime(value).AddDays(-1) : null;

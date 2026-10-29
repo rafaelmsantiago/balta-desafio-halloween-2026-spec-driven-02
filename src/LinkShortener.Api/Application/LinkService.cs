@@ -70,6 +70,10 @@ public sealed class LinkService(
         if (link is null)
             return ResolveLinkResult.NotFound();
 
+        // RN-03: link expirado não redireciona e não conta acesso.
+        if (LinkExpiration.IsExpired(link.ExpiresAtUtc, timeProvider.GetUtcNow()))
+            return ResolveLinkResult.Expired();
+
         // RF-05: toda requisição a link válido conta, sem filtro de robôs nem de repetições.
         await links.IncrementAccessCountAsync(link.Id, cancellationToken);
 
