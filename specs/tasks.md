@@ -19,6 +19,7 @@
 | T-16 | Responder erros de validação com ProblemDetails | D-09, Constituição (Qualidade) | T-04, T-11, T-12, T-14 | Teste de integração: entrada inválida retorna 400 com ProblemDetails e mensagem em português |
 | T-17 | Garantir persistência após reinício | RF-08, D-01 | T-07 | Teste de integração cria link, reinicia a aplicação sobre o mesmo banco SQLite e o redirecionamento funciona |
 | T-18 | Normalizar código para maiúsculas | RF-03, RF-04, RN-05, D-10 | T-01 | Teste unitário: código com minúsculas é convertido para maiúsculas antes da validação, da gravação e da busca, com o mesmo resultado sob a cultura tr-TR |
+| T-19 | Expor documento OpenAPI e interface Scalar em desenvolvimento | D-13 | T-05, T-07, T-09 | Teste de integração: em desenvolvimento, o documento OpenAPI lista os três endpoints com o corpo do POST e a interface Scalar responde 200; fora de desenvolvimento, ambos retornam 404 |
 
 T-10 (cache em memória) removida: não tem origem em requisito nem em decisão do
 plano, e um redirect servido pelo cache arriscaria pular o contador (RF-05) e a

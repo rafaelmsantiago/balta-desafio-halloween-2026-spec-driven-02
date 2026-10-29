@@ -72,6 +72,12 @@ do projeto.
   integração exigidos pela constituição. O relógio usa TimeProvider e o
   resolvedor da D-07 usa System.Net.Dns, ambos da biblioteca padrão; os falsos
   usados nos testes são escritos no próprio projeto de testes
+- D-13: interface de testes manuais da API com Scalar. Microsoft.AspNetCore.OpenApi
+  gera o documento OpenAPI a partir dos endpoints, e Scalar.AspNetCore monta a
+  interface sobre esse documento. Os dois ficam expostos só no ambiente de
+  desenvolvimento, para não publicar a documentação nem a interface em produção.
+  As rotas /openapi e /scalar são literais e têm precedência sobre GET /{code},
+  então não disputam com o redirecionamento
 
 ## Modelo de dados
 Link
