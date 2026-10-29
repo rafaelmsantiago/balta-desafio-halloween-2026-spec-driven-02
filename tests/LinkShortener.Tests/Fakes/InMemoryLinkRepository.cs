@@ -16,4 +16,7 @@ public sealed class InMemoryLinkRepository : ILinkRepository
         Links.Add(link);
         return Task.FromResult(true);
     }
+
+    public Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken) =>
+        Task.FromResult(Links.Any(l => l.Code == code));
 }

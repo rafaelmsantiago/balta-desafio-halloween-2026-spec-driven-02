@@ -7,7 +7,7 @@ public static class LinkEndpoints
 {
     private const string DateFormat = "yyyy-MM-dd";
 
-    public sealed record CreateLinkRequest(string? TargetUrl, string? ExpiresOn);
+    public sealed record CreateLinkRequest(string? TargetUrl, string? Code, string? ExpiresOn);
 
     public sealed record CreateLinkResponse(string ShortUrl, string Code, string? ExpiresOn);
 
@@ -34,12 +34,17 @@ public static class LinkEndpoints
             expiresOn = date;
         }
 
-        var result = await service.CreateAsync(new CreateLinkCommand(request.TargetUrl, expiresOn), cancellationToken);
+        var result = await service.CreateAsync(
+            new CreateLinkCommand(request.TargetUrl, expiresOn, request.Code), cancellationToken);
 
         return result.Status switch
         {
             CreateLinkStatus.Created => Created(httpRequest, result.Link!),
             CreateLinkStatus.Invalid => BadRequest(result.Error!),
+            CreateLinkStatus.CodeInUse => Results.Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "Código em uso",
+                detail: result.Error),
             _ => Results.Problem(
                 statusCode: StatusCodes.Status503ServiceUnavailable,
                 title: "Serviço indisponível",

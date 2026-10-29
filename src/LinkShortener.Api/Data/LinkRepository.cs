@@ -24,4 +24,7 @@ public sealed class LinkRepository(LinksDbContext context) : ILinkRepository
             return false;
         }
     }
+
+    public Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken) =>
+        context.Links.AnyAsync(l => l.Code == code, cancellationToken);
 }
