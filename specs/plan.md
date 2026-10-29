@@ -65,6 +65,13 @@ do projeto.
   exata e o índice da D-04 segue valendo
 - D-11: cada POST /api/links cria um link novo, sem procurar link existente
   para a mesma URL de destino (RF-01); não há índice único em TargetUrl
+- D-12: dependências, conforme a constituição. Microsoft.EntityFrameworkCore.Sqlite
+  implementa a persistência da D-01. Microsoft.EntityFrameworkCore.Design e a
+  ferramenta local dotnet-ef geram a migração, só em tempo de desenvolvimento.
+  Microsoft.AspNetCore.Mvc.Testing sobe a API em memória para os testes de
+  integração exigidos pela constituição. O relógio usa TimeProvider e o
+  resolvedor da D-07 usa System.Net.Dns, ambos da biblioteca padrão; os falsos
+  usados nos testes são escritos no próprio projeto de testes
 
 ## Modelo de dados
 Link
