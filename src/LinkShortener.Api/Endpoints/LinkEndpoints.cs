@@ -14,6 +14,18 @@ public static class LinkEndpoints
     public static void MapLinkEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/links", CreateAsync);
+        app.MapGet("/{code}", RedirectAsync);
+    }
+
+    private static async Task<IResult> RedirectAsync(string code, LinkService service, CancellationToken cancellationToken)
+    {
+        var result = await service.ResolveAsync(code, cancellationToken);
+
+        return result.Status switch
+        {
+            ResolveLinkStatus.Redirect => Results.Redirect(result.TargetUrl!),
+            _ => NotFound(),
+        };
     }
 
     private static async Task<IResult> CreateAsync(
@@ -59,6 +71,9 @@ public static class LinkEndpoints
 
         return Results.Created(shortUrl, new CreateLinkResponse(shortUrl, link.Code, expiresOn));
     }
+
+    private static IResult NotFound() =>
+        Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Link não encontrado", detail: "O link informado não existe.");
 
     private static IResult BadRequest(string detail) =>
         Results.Problem(statusCode: StatusCodes.Status400BadRequest, title: "Requisição inválida", detail: detail);

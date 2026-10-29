@@ -27,4 +27,7 @@ public sealed class LinkRepository(LinksDbContext context) : ILinkRepository
 
     public Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken) =>
         context.Links.AnyAsync(l => l.Code == code, cancellationToken);
+
+    public Task<Link?> FindByCodeAsync(string code, CancellationToken cancellationToken) =>
+        context.Links.AsNoTracking().SingleOrDefaultAsync(l => l.Code == code, cancellationToken);
 }

@@ -62,4 +62,14 @@ public sealed class LinkService(
         return CreateLinkResult.Unavailable(
             "Não foi possível gerar um código livre para o link agora. Tente novamente em instantes.");
     }
+
+    public async Task<ResolveLinkResult> ResolveAsync(string code, CancellationToken cancellationToken)
+    {
+        // D-10: o código da URL é normalizado antes da busca.
+        var link = await links.FindByCodeAsync(LinkCode.Normalize(code), cancellationToken);
+        if (link is null)
+            return ResolveLinkResult.NotFound();
+
+        return ResolveLinkResult.Redirect(link.TargetUrl);
+    }
 }

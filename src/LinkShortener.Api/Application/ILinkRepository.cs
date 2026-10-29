@@ -6,4 +6,6 @@ public interface ILinkRepository
     Task<bool> TryAddAsync(Link link, CancellationToken cancellationToken);
 
     Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken);
+
+    Task<Link?> FindByCodeAsync(string code, CancellationToken cancellationToken);
 }
