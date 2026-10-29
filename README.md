@@ -22,9 +22,10 @@ Uma API de encurtador de links em **.NET 10 (Minimal API)**, com **SQLite via EF
 - **Colisão de código**: se o código gerado já existir, tenta outro até 5 vezes e depois responde 503
 - **Erros padronizados**: todas as falhas respondem com ProblemDetails e mensagem em português
 - **Persistência**: os links sobrevivem ao reinício da aplicação
-- **115 testes** unitários e de integração, cobrindo os critérios de aceite de cada tarefa
+- **Interface de testes com Scalar**: em desenvolvimento, a API publica o documento OpenAPI e uma interface para chamar os endpoints pelo navegador
+- **119 testes** unitários e de integração, cobrindo os critérios de aceite de cada tarefa
 
-Para rodar: `dotnet run --project src/LinkShortener.Api` (sobe em http://localhost:5069). Para testar: `dotnet test`.
+Para rodar: `dotnet run --project src/LinkShortener.Api` (sobe em http://localhost:5069 e abre o Scalar em http://localhost:5069/scalar/v1). Para testar: `dotnet test`.
 
 Neste processo eu aprendi:
 

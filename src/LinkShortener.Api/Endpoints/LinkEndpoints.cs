@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using LinkShortener.Api.Application;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 
 namespace LinkShortener.Api.Endpoints;
 
@@ -14,9 +16,60 @@ public static class LinkEndpoints
 
     public static void MapLinkEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/links", CreateAsync);
-        app.MapGet("/api/links/{code}/stats", GetStatsAsync);
-        app.MapGet("/{code}", RedirectAsync);
+        // Os metadados abaixo só descrevem o contrato no documento OpenAPI (D-13).
+        app.MapPost("/api/links", CreateAsync)
+            .WithTags("Links")
+            .WithSummary("Cria um link curto")
+            .AddOpenApiOperationTransformer(DescribeCreateRequestAsync)
+            .Produces<CreateLinkResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
+
+        app.MapGet("/api/links/{code}/stats", GetStatsAsync)
+            .WithTags("Links")
+            .WithSummary("Consulta o total de acessos de um link")
+            .Produces<LinkStats>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        app.MapGet("/{code}", RedirectAsync)
+            .WithTags("Redirecionamento")
+            .WithSummary("Redireciona para a URL de destino")
+            .Produces(StatusCodes.Status302Found)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status410Gone);
+    }
+
+    // Descreve o corpo sem usar Accepts, que recusaria com 415 o que não fosse JSON
+    // antes de o endpoint responder 400 em português (D-09).
+    private static async Task DescribeCreateRequestAsync(
+        OpenApiOperation operation,
+        OpenApiOperationTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        var schema = await context.GetOrCreateSchemaAsync(typeof(CreateLinkRequest), null, cancellationToken);
+
+        // Só targetUrl é obrigatório; code e expiresOn são opcionais (RF-03, RF-06).
+        schema.Required = new HashSet<string> { "targetUrl" };
+        Describe(schema, "targetUrl", "URL de destino, http ou https, com até 2048 caracteres.");
+        Describe(schema, "code", "Código próprio opcional, de 4 a 20 caracteres, com letras de A a Z e números de 1 a 9.");
+        Describe(schema, "expiresOn", "Data de expiração opcional, no formato yyyy-MM-dd, em UTC.");
+
+        operation.RequestBody = new OpenApiRequestBody
+        {
+            Required = true,
+            Content = new Dictionary<string, OpenApiMediaType>
+            {
+                ["application/json"] = new() { Schema = schema },
+            },
+        };
+    }
+
+    private static void Describe(OpenApiSchema schema, string property, string description)
+    {
+        if (schema.Properties?.TryGetValue(property, out var propertySchema) == true
+            && propertySchema is OpenApiSchema concrete)
+            concrete.Description = description;
     }
 
     private static async Task<IResult> GetStatsAsync(string code, LinkService service, CancellationToken cancellationToken)

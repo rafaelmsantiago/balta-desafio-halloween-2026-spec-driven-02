@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace LinkShortener.Tests.Integration;
 
@@ -16,8 +17,11 @@ public sealed class LinkShortenerFactory(string connectionString) : WebApplicati
 
     public ICodeGenerator? CodeGenerator { get; set; }
 
+    public string Environment { get; set; } = Environments.Development;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment(Environment);
         builder.UseSetting("ConnectionStrings:Links", connectionString);
 
         builder.ConfigureTestServices(services =>
